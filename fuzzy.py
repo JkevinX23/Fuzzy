@@ -6,7 +6,7 @@ def getfMax(rule3,rule5,rule6,rule8,rule9,emprest_hig):
     t2 = np.fmax(t1,rule6)
     t3 = np.fmax(t2,rule8)
     t4 = np.fmax(t3,rule9)
-    t5 = np.fmin(t4,emprest_hig)
+    t5 = np.fmax(t4,emprest_hig)
     return t5
 '''
 Emprestimos para negativados..
@@ -78,16 +78,25 @@ plt.tight_layout()
 plt.show()
 
 ##########################################################################
-user_saldo = 50
-user_hist = -50
+user_saldo = -100
+user_hist = -100
 ###########################################################################
 value_saldo_low = fuzz.interp_membership(x_saldoMedio,saldo_low, user_saldo)
 value_saldo_med = fuzz.interp_membership(x_saldoMedio,saldo_med, user_saldo)
 value_saldo_hig = fuzz.interp_membership(x_saldoMedio,saldo_hig, user_saldo)
 
+print(value_saldo_low)
+print(value_saldo_med)
+print(value_saldo_hig)
+
+
 value_hist_low = fuzz.interp_membership(x_saldoMedio,historic_low, user_hist)
 value_hist_med = fuzz.interp_membership(x_saldoMedio,historic_med, user_hist)
 value_hist_hig = fuzz.interp_membership(x_saldoMedio,historic_hig, user_hist)
+
+print(value_hist_low)
+print(value_hist_med)
+print(value_hist_hig)
 ############################################################################
 '''
 
@@ -107,7 +116,6 @@ not - 1, 2
 med - 4, 7
 yes - 3, 5, 6, 8, 9
 '''
-
 rule1 = np.fmin(value_saldo_low,value_hist_low)
 rule2 = np.fmin(value_saldo_low,value_hist_med)
 rule3 = np.fmin(value_saldo_low,value_hist_hig)
@@ -117,11 +125,20 @@ rule6 = np.fmin(value_saldo_med,value_hist_hig)
 rule7 = np.fmin(value_saldo_hig,value_hist_low)
 rule8 = np.fmin(value_saldo_hig,value_hist_med)
 rule9 = np.fmin(value_saldo_hig,value_hist_hig)
+print("rule1: ",rule1)
+print("rule2: ",rule2)
+print("rule3: ",rule3)
+print("rule4: ",rule4)
+print("rule5: ",rule5)
+print("rule6: ",rule6)
+print("rule7: ",rule7)
+print("rule8: ",rule8)
+print("rule9: ",rule9)
 
-activate_emprest_low = np.fmin(rule1,np.fmax(rule2,emprest_low))
-activate_emprest_med = np.fmin(rule4,np.fmax(rule7,emprest_med))
+activate_emprest_low = np.fmax(rule1,np.fmax(rule2,emprest_low))
+activate_emprest_med = np.fmax(rule4,np.fmax(rule7,emprest_med))
 activate_emprest_hig = getfMax(rule3,rule5,rule6,rule8,rule9,emprest_hig)
-
+print("---")
 print(activate_emprest_low)
 print(activate_emprest_med)
 print(activate_emprest_hig)
@@ -152,10 +169,13 @@ plt.show()
 
 
 
-######################################################3
+######################################################
 agregado = np.fmax(activate_emprest_hig,np.fmax(activate_emprest_med,activate_emprest_low))
-emprest = fuzz.defuzz(x_emprestimo,agregado,'centroid')
+print (agregado)
+emprest = fuzz.defuzz(x_emprestimo,activate_emprest_low,'mom')
 emprest_activate = fuzz.interp_membership(x_emprestimo,agregado,emprest)
+#print(emprest)
+#print (emprest_activate)
 
 
 fig , ax0 = plt .  subplots ( figsize = ( 8 , 3 ))
